@@ -1,0 +1,99 @@
+Only documenting stuff that seems interesting for API snoopers :)
+
+Base URL: https://kick.com
+
+/documentation
+ - Methods: GET, HEAD
+ - Result: Redirects to home
+
+/documentation/api-docs.json
+ - Methods: GET, HEAD
+ - Result: HTTP/500
+
+/docs/{jsonFile?}
+ - Methods: GET, HEAD
+ - Result: HTTP/404
+
+/docs/asset/{asset}
+ - Methods: GET, HEAD
+ - Result: HTTP/404
+
+/api/v1/user
+ - Methods: GET, HEAD
+ - Result: JSON `{}`
+ - Requires Bearer auth
+
+/api/v1/resource-urls
+ - Methods: GET, HEAD
+ - Result: JSON `{"asset_url":"..","cloudfront_url":".."}`
+
+/kick-token-provider
+ - Methods: GET, HEAD
+ - Result: JSON `{"enabled":true,"nameFieldName":"..","unrandomizedNameFieldName":"..","validFromFieldName":"..","encryptedValidFrom":".."}`
+
+/channels/check-username/{username}
+ - Methods: GET, HEAD
+ - Result: TEXT `Good to go` || HTTP/400
+
+/api/search
+ - Methods: GET, HEAD
+ - Result: HTTP/400
+ - Probably requires Bearer auth
+
+/api/v1/channels/{username}/chat
+ - Methods: GET, HEAD
+ - Result: HTTP/500
+ - Requires Bearer auth
+
+/api/v2/channels/followed?cursor=0
+ - Methods: GET, HEAD
+ - Result: JSON
+ - Requires Bearer auth
+
+/featured-livestreams/non-following
+ - Methods: GET, HEAD
+ - Result: JSON `[{"category_name":"..","channel_slug":"..","is_live":true,"profile_picture":"..","user_username":"..","viewer_count":123},..]`
+
+/stream/livestreams/{lang}
+ - Methods: GET, HEAD
+ - Result: JSON
+
+/stream/featured-livestreams/{lang}
+ - Methods: GET, HEAD
+ - Result: JSON
+
+/api/v1/channels/{channel}
+ - Methods: GET, HEAD
+ - Result: JSON @see ../src/kick_channel.d.ts:Channel
+
+/api/v2/channels/{channel}/me
+ - Methods: GET, HEAD
+ - Result: JSON `{"subscription":null,"founder":false,"is_following":false,"is_broadcaster":false,"is_moderator":false,"leaderboards":{"gifts":{"quantity":0}}}`
+ - Requires Bearer auth
+
+/api/v2/channels/{channel}/plans
+ - Methods: GET, HEAD
+ - Result: JSON @see ../src/kick_channel.d.ts:Plan
+ - Requires Bearer auth
+
+/api/v2/channels/{channel}/links
+ - Methods: GET, HEAD
+ - Result: JSON @see ../src/kick_channel.d.ts:Link
+
+/api/v2/channels/{channel}/leaderboards
+ - Methods: GET, HEAD
+ - Result: JSON `{"gifts":[{"user_id":123,"username":"..","quantity":123},..]}`
+ - Requires Bearer auth
+
+/emotes/{channel}
+ - Methods: GET, HEAD
+ - Result: JSON
+
+/current-viewers?ids[]={livestream_id}
+ - Methods: GET, HEAD
+ - Result: JSON `[{"livestream_id":123,"viewers":123}]`
+
+/api/v1/live-streams/{livestream_slug}/heart-beat?connection_uuid={connection_uuid}
+ - Methods: GET, HEAD
+ - Result: JSON `{"content":{"category_id":123,"subcategory_id":123,"channel_id":123,"livestream_id":123,"user_id":123,"event_datetime":"..","ip":"..","connection_uuid":".."}}`
+ - Requires Bearer auth for user_id
