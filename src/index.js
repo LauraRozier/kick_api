@@ -3,6 +3,7 @@ const Humanoid = require("humanoid-js");
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
 
+// Humanoid is kinds meh and temperamental when it'll actually give a useable response
 async function pullInfoHumanoid() {
     await (new Humanoid()).get('https://kick.com/api/v1/channels/akiwoo')
         .then((res) => {
@@ -22,20 +23,23 @@ async function pullInfoHumanoid() {
         });
 }
 
+// Puppateer-Stealth seems most stable
 async function pullInfoPuppeteer() {
     puppeteer.use(pluginStealth());
     await puppeteer.launch({ headless: true })
         .then(async (browser) => {
+            // Open a new page/tab
             const page = await browser.newPage();
+            // Pre-define the waiter / response verifier
             const responseCatcher = page.waitForResponse(
                 async (res) => res.request().url().includes('akiwoo') &&
                     res.request().method() != 'OPTIONS' &&
                     await res.json().then(() => true, () => false).catch(() => false)
             );
+            // Go to the actual page
             await page.goto("https://kick.com/api/v1/channels/akiwoo");
-            // and now we wait for the AJAX response!
+            // Wait for the response we're looking for
             const response = await responseCatcher;
-            console.debug(await response.text());
             // now get the JSON payload
             /** @type {import("./kick_channel").Channel} */
             const channel = await response.json();
