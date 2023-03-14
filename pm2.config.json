@@ -1,0 +1,20 @@
+{
+  "apps": [
+    {
+      "name": "KickBot",
+      "script": "npm",
+      "interpreter": "none",
+      "args": "start",
+      "instances": 1,
+      "watch": false,
+      "autorestart": true,
+      "instance_var": 'INSTANCE_ID',
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "env_production": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "<guild_id>": {
+    "enabled": true,
+    "channel_id": "<channel_id>",
+    "message": "<@&<role_id>> Good news! {user_name} is live, playing `{stream_game}`."
+  }
+}

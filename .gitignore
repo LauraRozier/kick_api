@@ -1,3 +1,13 @@
 /package-lock.json
 /node_modules
-/.cache/puppeteer/chrome
+
+/.cache/puppeteer/*
+!/.cache/puppeteer/.notempty
+
+/config/*
+!/config/template_config.json
+!/config/template_guilds.json
+!/config/template_bindings.json
+
+/logs/*
+!/logs/.notempty

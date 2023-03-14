@@ -1,0 +1,14 @@
+{
+  "discord": {
+    "auth": {
+      "client_id": "",
+      "client_secret": "",
+      "access_token": ""
+    }
+  },
+  "redis": {
+    "useSocket": false,
+    "path": "/tmp/redis.sock",
+    "url": "redis://localhost:6379"
+  }
+}
