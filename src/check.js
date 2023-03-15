@@ -1,6 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const redis = require("./redis");
 const kick = require("./kick/kick");
+const logger = require('./logger');
 
 /**
  * @param {import("discord.js").Client} client
@@ -9,26 +10,47 @@ module.exports.check = async (client) => {
     const bindings = require('../config/bindings.json');
     const guilds = require(`../config/guilds.json`);
     const redisClient = await redis();
-    await kick.init();
+    const initialized = await kick.init()
+        .then(() => true, () => false)
+        .catch((err) => {
+            logger.error(`check:check - kick.init > ${err}`);
+            return false;
+        });
+
+    if (!initialized) return;
 
     for (const [channel, guildIds] of Object.entries(bindings)) {
         const redisKey = `kickbot_channel-live-${channel}`;
 
         /** @type {import("./kick/kick_channel").Channel?} */
-        const kickChannel = await kick.getChannel(channel);
-        const hasChannel = await redisClient
-            .get(redisKey)
-            .then((val) => val === null ? false : true)
-            .catch(() => false);
+        const kickChannel = await kick.getChannel(channel)
+            .then((data) => data, () => null)
+            .catch((err) => {
+                logger.error(`check:check - kick.getChannel > ${err}`);
+                return null;
+            });
 
-        if (kickChannel === null || kickChannel.livestream === null || !kickChannel.livestream.is_live) {
-            if (hasChannel) await redisClient.del(redisKey);
+        if ((!kickChannel) || (!kickChannel.livestream) || (!kickChannel.livestream.is_live)) {
+            await redisClient.del(redisKey)
+                .catch((err) => {
+                    logger.error(`check:check > ${err}`);
+                });
             continue;
         }
 
+        const hasChannel = await redisClient.get(redisKey)
+            .then((val) => (!val) ? false : true, () => false)
+            .catch((err) => {
+                logger.error(`check:check - redisClient.get > ${err}`);
+                return false;
+            });
+
         if (hasChannel) continue;
 
-        await redisClient.set(redisKey, 1);
+        await redisClient.set(redisKey, 1)
+            .catch((err) => {
+                logger.error(`check:check - redisClient.set > ${err}`);
+            });
 
         for (const guildId of guildIds) {
             const guildConf = guilds[guildId];
@@ -59,7 +81,14 @@ module.exports.check = async (client) => {
                         .setStyle(ButtonStyle.Link)
                         .setURL(`https://kick.com/${kickChannel.slug}`)
                 );
-            notifChannel.send({ content: msg, ephemeral: true, embeds: [ embed ], components: [ row ] });
+            notifChannel.send({
+                content: msg,
+                ephemeral: true,
+                embeds: [ embed ],
+                components: [ row ]
+            }).catch((err) => {
+                logger.error(`check:check - notifChannel.send > ${err}`);
+            });
         }
     }
 
