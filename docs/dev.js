@@ -33,12 +33,12 @@ async function pullInfoPuppeteer() {
             const page = await browser.newPage();
             // Pre-define the waiter / response verifier
             const responseCatcher = page.waitForResponse(
-                async (res) => res.request().url().includes('akiwoo') &&
+                async (res) => res.request().url().includes('api/v1/channels/sixtysevenradio') &&
                     res.request().method() != 'OPTIONS' &&
                     await res.json().then(() => true, () => false).catch(() => false)
             );
             // Go to the actual page
-            await page.goto("https://kick.com/api/v1/channels/akiwoo");
+            await page.goto("https://kick.com/api/v1/channels/sixtysevenradio");
             // Wait for the response we're looking for
             const response = await responseCatcher;
             // now get the JSON payload
@@ -52,6 +52,7 @@ async function pullInfoPuppeteer() {
                 `Game: ${channel.livestream.categories[0].name}\n` +
                 `Thumbnail: ${channel.livestream.thumbnail.url}\n\n`
             ); // Print the result
+            console.info(JSON.stringify(channel, null, 4));
             await browser.close();
         });
 }
